@@ -56,6 +56,13 @@ class BotDetector
                 $type = 'SUSPECT';
             }
         }
+
+        // cek urutan secara umum di browser
+        if (!isset($headers['Sec-Ch-Ua'])) {
+            $flags[] = 'missing_ch_ua';
+            $type = 'SUSPECT';
+        }
+
         if (stripos($userAgent, 'curl') !== false || stripos($userAgent, 'python') !== false) {
             $flags[] = 'script_client';
             $type = 'BOT';
