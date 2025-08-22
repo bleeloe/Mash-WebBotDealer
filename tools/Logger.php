@@ -18,8 +18,8 @@ class TrafficLogger
         // Rotating file: 30 hari
         $handler = new RotatingFileHandler($logDir . '/traffic.log', 30, Logger::INFO);
 
-        // Format CSV
-        $output = "%datetime%,%extra.ip%,%extra.type%,\"%extra.ua%\",\"%extra.ref%\",\"%extra.asn%\",\"%extra.hostname%\",\"%extra.flags%\"\n";
+        // Format CSV        
+        $output = "%datetime%,%context.ip%,%context.type%,\"%context.ua%\",\"%context.ref%\",\"%context.asn%\",\"%context.hostname%\",\"%context.flags%\"\n";
         $formatter = new LineFormatter($output, 'Y-m-d H:i:s', true, true);
         $handler->setFormatter($formatter);
 
@@ -27,7 +27,7 @@ class TrafficLogger
     }
 
     public function log(array $data)
-    {
+    {            
         $this->logger->info('visit', $data);
     }
 }

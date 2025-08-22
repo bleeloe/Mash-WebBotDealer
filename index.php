@@ -16,9 +16,6 @@ $logDir = $_ENV['LOG_DIR'] ?? __DIR__ . '/logs/';
 $detector = new BotDetector($_ENV['IPINFO_TOKEN'] ?? null);
 $result = $detector->analyzeRequest($_SERVER);
 
-var_dump($result);
-die;
-
 // --- Logging ---
 $logger = new TrafficLogger($logDir);
 $logger->log($result);
