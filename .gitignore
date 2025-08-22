@@ -1,0 +1,19 @@
+# Ignore vendor directory
+vendor/
+
+# Ignore log files
+logs/
+*.log
+
+# Ignore cache files
+var/cache/
+var/logs/
+
+# Ignore user files
+var/
+
+# Ignore build files
+build/
+
+# Ignore tests files
+tests/_output/
