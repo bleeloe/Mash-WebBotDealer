@@ -41,13 +41,14 @@ class BotDetector
         $asn = '-';
         if ($this->ipinfoToken) {
             $asn = $this->lookupASN($ip);
-            if ($asn && preg_match('/(amazon|aws|ovh|digitalocean|m247|hetzner|google cloud)/i', $asn)) {
+            if ($asn && preg_match('/(amazon|aws|ec2|google cloud|gcp|microsoft|azure|ovh|soyoustart|kimsufi|digitalocean|do-?droplet|linode|vultr|vultrusercontent|hetzner|online.net|scaleway|leaseweb|m247|contabo|choopa|shinjiru|upcloud|ionos|1and1|netcup|hostwinds|kamatera|ramnode|interserver|hivelocity|quadra|cloudsigma|bandwagon|alphavps|shinjiru|terrahost|uccloud|colo|datacamp|phoenixnap|cloudways)/i', $asn)) {
                 $flags[] = 'datacenter';
                 if ($type !== 'BOT') {
                     $type = 'SUSPECT';
                 }
             }
         }
+
 
         // 4. Header heuristic
         if (!isset($headers['Accept-Language'])) {
