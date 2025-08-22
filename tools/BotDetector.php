@@ -4,6 +4,8 @@ use Jaybizzle\CrawlerDetect\CrawlerDetect;
 class BotDetector
 {
     protected $ipinfoToken;
+    protected $rateLimit = 5; // max hit per menit
+    protected $rateWindow = 60; // detik
 
     public function __construct($ipinfoToken = null)
     {
@@ -59,15 +61,25 @@ class BotDetector
         }
 
         // cek urutan secara umum di browser
-        if (!isset($headers['Sec-Ch-Ua'])) {
-            $flags[] = 'missing_ch_ua';
-            $type = 'SUSPECT';
-        }
+        // if (!isset($headers['Sec-Ch-Ua'])) {
+        //     $flags[] = 'missing_ch_ua';
+        //     $type = 'SUSPECT';
+        // }
 
         if (stripos($userAgent, 'curl') !== false || stripos($userAgent, 'python') !== false) {
             $flags[] = 'script_client';
             $type = 'BOT';
         }
+
+
+        //throttle
+        if (!$this->throttle($_SERVER['REMOTE_ADDR'])) {
+            // Flag BOT / Suspect
+            $flags[] = 'rate_limit_exceeded';
+            $type = 'BOT';
+        }
+
+        
 
         return [
             'datetime' => date('Y-m-d H:i:s'),
@@ -86,5 +98,38 @@ class BotDetector
         $url = "https://ipinfo.io/{$ip}/org?token={$this->ipinfoToken}";
         $ctx = stream_context_create(['http' => ['timeout' => 2]]);
         return @file_get_contents($url, false, $ctx) ?: '-';
+    }
+
+    public function throttle($ip)
+    {
+        $key = sys_get_temp_dir() . '/traffic_' . md5($ip) . '.json';
+
+        $now = time();
+        $data = [
+            'count' => 0,
+            'start' => $now,
+        ];
+
+        if (file_exists($key)) {
+            $data = json_decode(file_get_contents($key), true);
+
+            // reset kalau window habis
+            if ($now - $data['start'] > $this->rateWindow) {
+                $data = [
+                    'count' => 0,
+                    'start' => $now,
+                ];
+            }
+        }
+
+        $data['count']++;
+
+        file_put_contents($key, json_encode($data));
+
+        if ($data['count'] > $this->rateLimit) {
+            return false; // throttle triggered
+        }
+
+        return true; // masih aman
     }
 }
